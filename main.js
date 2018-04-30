@@ -1,6 +1,16 @@
 const electron = require("electron"),
   path = require("path"),
-  url = require("url");
+  url = require("url"),
+  getPort = require("get-port"),
+  goghcoin = require("./goghcoin/src/server");
+
+getPort().then(port => {
+  const server = goghcoin.app.listen(port, () => {
+    console.log(`Running blockchain node on: http://localhost:${port}`);
+  });
+  goghcoin.startP2PServer(server);
+  global.sharedPort = port;
+});
 
 const { app, BrowserWindow } = electron;
 
@@ -11,7 +21,7 @@ const createWindow = () => {
     width: 800,
     height: 600,
     resizable: false,
-    title: "Nomadcoin Wallet"
+    title: "goghcoin Wallet"
   });
 
   const ENV = process.env.ENV;
@@ -28,8 +38,21 @@ const createWindow = () => {
     );
   }
 
-
+  mainWindow.on("closed", () => {
+    mainWindow = null;
+  });
 };
 
+app.on("window-all-closed", () => {
+  if (process.platform !== "darwin") {
+    app.quit();
+  }
+});
+
+app.on("activate", () => {
+  if (mainWindow === null) {
+    createWindow();
+  }
+});
 
 app.on("ready", createWindow);
