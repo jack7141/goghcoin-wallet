@@ -1,0 +1,12 @@
+{
+  "scripts": {
+    "start": "concurrently -taskkill -other \" yarn run startReact \" \" set ENV=dev&& electron .",
+    "startReact":"cd uidev && yarn start"
+  },
+  "main": "main.js",
+  "devDependencies": {
+    "concurrently": "^3.5.1",
+    "electron": "^1.8.3"
+  }
+}
+
